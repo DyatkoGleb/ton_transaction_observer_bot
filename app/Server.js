@@ -18,7 +18,7 @@ module.exports = class Server
     }
 
     startServer = () => {
-        const port = process.env.PORT
+        const port = process.env.PORT || 2222
 
         this.app.listen(port, () => {
             console.log(`Server is running on port ${port}`)
