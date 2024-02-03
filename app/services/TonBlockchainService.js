@@ -2,9 +2,12 @@ const { HttpClient, Api } = require('tonapi-sdk-js')
 
 
 module.exports = class TonBlockchainService {
+    LIMIT = 1000
+
     constructor(walletAddress, tonApiToken) {
         this.walletAddress = walletAddress
         this.tonApiToken = tonApiToken
+        this.timestampLastTransaction = Math.floor(Date.now() / 1000)
 
         this.#makeClient()
     }
@@ -25,11 +28,18 @@ module.exports = class TonBlockchainService {
 
     getEvents = async (jetton) => {
         const transfers = []
-        const limit = 10
 
-        const response = await this.client.accounts.getAccountEvents(this.walletAddress, { limit });
+        const response = await this.client.accounts.getAccountEvents(
+            this.walletAddress,
+            {
+                start_date: this.timestampLastTransaction,
+                limit: this.LIMIT
+            }
+        )
 
         const events = response.events
+
+        this.timestampLastTransaction = events[0]?.timestamp ?? this.timestampLastTransaction
 
         for (let i = 0; i < events.length; i++) {
             const actions = events[i].actions
