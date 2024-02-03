@@ -2,7 +2,7 @@ const { HttpClient, Api } = require('tonapi-sdk-js')
 
 
 module.exports = class TonBlockchainService {
-    LIMIT = 1000
+    LIMIT = 10
 
     constructor(walletAddress, tonApiToken) {
         this.walletAddress = walletAddress
@@ -45,10 +45,14 @@ module.exports = class TonBlockchainService {
             const actions = events[i].actions
 
             for (let action of actions) {
-                if (action.type === 'JettonTransfer' && action.JettonTransfer.jetton.symbol === jetton) {
+                if (
+                    action.type === 'JettonTransfer'
+                    && action.JettonTransfer.jetton.symbol === jetton
+                    && action.status === 'ok'
+                ) {
                     transfers.push({
-                        status: action.status,
                         value: action.simple_preview.value,
+                        jettonName: action.JettonTransfer.jetton.name
                     })
                 }
             }
